@@ -18,13 +18,13 @@ def test_unparsable_view() -> None:
 
 
 def test_parsable_body() -> None:
-    SQL = "create or replace view public.some_view as select 1 one;"
+    SQL = "create or replace view public.some_view with (security_invoker = on) as select 1 one;"
     try:
         view = PGView.from_sql(SQL)
     except SQLParseFailure:
         pytest.fail(f"Unexpected SQLParseFailure for view {SQL}")
 
-    SQL = "create view public.some_view(one) as select 1 one;"
+    SQL = "create view public.some_view(one) with (security_invoker = on) as select 1 one;"
     try:
         view = PGView.from_sql(SQL)
         assert view.signature == "some_view"

@@ -26,7 +26,7 @@ def test_check_diff_create(engine) -> None:
     exp = (
         "New upgrade operations detected: "
         "[('create_entity', 'PGView: public.testExample', "
-        '\'CREATE VIEW "public"."testExample" AS select feature_name from information_schema.sql_features;\')]'
+        '\'CREATE VIEW "public"."testExample" WITH (security_invoker = on) AS select feature_name from information_schema.sql_features;\')]'
     )
     assert e_info.value.args[0] == exp
 

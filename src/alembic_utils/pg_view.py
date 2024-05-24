@@ -36,7 +36,7 @@ class PGView(ReplaceableEntity):
     @classmethod
     def from_sql(cls, sql: str) -> "PGView":
         """Create an instance from a SQL string"""
-        template = "create{}view{:s}{schema}.{signature}{:s}as{:s}{definition}"
+        template = "create{}view{:s}{schema}.{signature}{:s}with{:s}(security_invoker{:s}={:s}on){:s}as{:s}{definition}"
         result = parse(template, sql, case_sensitive=False)
         if result is not None:
             # If the signature includes column e.g. my_view (col1, col2, col3) remove them
@@ -53,7 +53,7 @@ class PGView(ReplaceableEntity):
     def to_sql_statement_create(self) -> TextClause:
         """Generates a SQL "create view" statement"""
         return sql_text(
-            f'CREATE VIEW {self.literal_schema}."{self.signature}" AS {self.definition};'
+            f'CREATE VIEW {self.literal_schema}."{self.signature}" WITH (security_invoker = on) AS {self.definition};'
         )
 
     def to_sql_statement_drop(self, cascade=False) -> TextClause:
@@ -71,7 +71,7 @@ class PGView(ReplaceableEntity):
             f"""
         do $$
             begin
-                CREATE OR REPLACE VIEW {self.literal_schema}."{self.signature}" AS {self.definition};
+                CREATE OR REPLACE VIEW {self.literal_schema}."{self.signature}" WITH (security_invoker = on) AS {self.definition};
 
             exception when others then
                 DROP VIEW IF EXISTS {self.literal_schema}."{self.signature}";
